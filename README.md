@@ -1,0 +1,2 @@
+# Akka-Streams-Example
+This is Proof-of-Concept project for Akka Streams. Akka Stream handle back-pressure which is one of the core featue offered by Akka-Streams. Back-pressure is the ability to slow down the producers if the consumers are slow and unable to consume at the rate at which the producers are producing. Akka Streams are high performance fully asynchronous highly efficient pipelines.The three main components of Streams are Source, Sink and Flow.
