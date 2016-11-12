@@ -8,8 +8,10 @@ import akka.stream._
 import akka.stream.scaladsl._
 import akka.{ NotUsed, Done }
 import akka.actor.ActorSystem
+import akka.util.ByteString
 import scala.concurrent._
 import scala.concurrent.duration._
+import java.nio.file.Paths
 
 
 object Main extends App{
@@ -46,7 +48,7 @@ object Main extends App{
 
 
 
-  /* Multiple Flows */
+  /* Multiple Flows: Flow Chaining */
   /* Source - Flow - Flow - Sink */
 
   val flow2: Flow[Int, Int, NotUsed] = Flow[Int].map(_*2)
@@ -62,10 +64,23 @@ object Main extends App{
 
   /* Factorial Flow */
 
-  val factorials = source.via(flow1).scan(BigInt(1))((acc, next) => acc * next)
+  val factorials = source.via(flow1).scan(BigInt(1))((acc, next) => acc * next) // Still a SOURCE
 
   factorials
-    .map(num => num.toString)
-    .runForeach(i => println(i))
+    .map(num => num.toString)  // Transformation function: Flow
+    .runForeach(i => println(i))  // Sink
+
+
+
+  def lineSink(filename: String): Sink[String, Future[IOResult]] =
+    Flow[String]
+      .map(s => ByteString(s + "\n"))
+      .toMat(FileIO.toPath(Paths.get(filename)))(Keep.right)
+
+  factorials
+    .map(_.toString)
+    .runWith(lineSink("factorial.txt"))
+
+
 
 }
