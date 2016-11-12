@@ -18,15 +18,26 @@ object Main extends App{
   implicit val materializer = ActorMaterializer()
 
   val source: Source[Int, NotUsed] = Source(0 to 99)
-  val flow: Flow[Int, Int, NotUsed] = Flow[Int].map(_ + 1)
+  val flow1: Flow[Int, Int, NotUsed] = Flow[Int].map(_ + 1)
   val sink: Sink[Any, Future[Done]] = Sink.foreach(println)
 
-  val graph: RunnableGraph[NotUsed] =
+  val graph1: RunnableGraph[NotUsed] =
     source
-      .via(flow)
+      .via(flow1)
       .to(sink)
 
   // materializer is implicitly used here
-  graph.run()
+  graph1.run()
+
+
+
+  val flow2: Flow[Int, Int, NotUsed] = Flow[Int].map(_*2)
+  val graph2: RunnableGraph[NotUsed] =
+    source
+      .via(flow1)  // Flows can be re-used
+      .via(flow2)  // Flows can clubbed - can be concatenated.
+      .to(sink)
+
+  graph2.run()
 
 }
