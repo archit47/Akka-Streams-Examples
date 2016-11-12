@@ -64,7 +64,7 @@ object Main extends App{
 
   /* Factorial Flow */
 
-  val factorials = source.via(flow1).scan(BigInt(1))((acc, next) => acc * next) // Still a SOURCE
+  val factorials = source.via(flow1).scan(BigInt(1))((acc, next) => acc * next) // Still a SOURCE?
 
   factorials
     .map(num => num.toString)  // Transformation function: Flow
@@ -72,15 +72,25 @@ object Main extends App{
 
 
 
+  /* Sink to write to a File, given the pathname*/
+
   def lineSink(filename: String): Sink[String, Future[IOResult]] =
     Flow[String]
       .map(s => ByteString(s + "\n"))
       .toMat(FileIO.toPath(Paths.get(filename)))(Keep.right)
 
-  factorials
+
+  factorials  // factorials source
     .map(_.toString)
     .runWith(lineSink("factorial.txt"))
 
 
+  /* Throttling: Controlling the stream on time basis */
+
+  val done: Future[Done] =
+    factorials
+      .zipWith(Source(0 to 100))((num, idx) => s"$idx! = $num")
+      .throttle(1, 1.second, 1, ThrottleMode.shaping)
+      .runForeach(println)
 
 }
