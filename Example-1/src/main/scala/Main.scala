@@ -21,6 +21,19 @@ object Main extends App{
   val flow1: Flow[Int, Int, NotUsed] = Flow[Int].map(_ + 1)
   val sink: Sink[Any, Future[Done]] = Sink.foreach(println)
 
+
+  /* No Flow */
+  /* Connecting the Source to Sink directly */
+
+  source
+    .to(sink)
+    .run()  // materializer is implicitly used here
+
+
+
+  /* Single Flow */
+  /* Source - Flow - Sink */
+
   val graph1: RunnableGraph[NotUsed] =
     source
       .via(flow1)
@@ -30,6 +43,9 @@ object Main extends App{
   graph1.run()
 
 
+
+  /* Multiple Flows */
+  /* Source - Flow - Flow - Sink */
 
   val flow2: Flow[Int, Int, NotUsed] = Flow[Int].map(_*2)
   val graph2: RunnableGraph[NotUsed] =
