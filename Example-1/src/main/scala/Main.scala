@@ -2,6 +2,8 @@
   * Created by archit on 11/12/16.
   */
 
+
+
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.{ NotUsed, Done }
@@ -55,5 +57,15 @@ object Main extends App{
       .to(sink)
 
   graph2.run()
+
+
+
+  /* Factorial Flow */
+
+  val factorials = source.via(flow1).scan(BigInt(1))((acc, next) => acc * next)
+
+  factorials
+    .map(num => num.toString)
+    .runForeach(i => println(i))
 
 }
