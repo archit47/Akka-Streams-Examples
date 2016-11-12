@@ -4,4 +4,5 @@ Example-1/target
 .class
 Example-1/target/
 Example-1/project/target
-Example-1/project/target/
+Example-1/project/.idea
+.cache
