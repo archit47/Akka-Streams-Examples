@@ -12,7 +12,7 @@ import akka.util.ByteString
 import scala.concurrent._
 import scala.concurrent.duration._
 import java.nio.file.Paths
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends App{
 
@@ -28,6 +28,7 @@ object Main extends App{
 
   /* No Flow */
   /* Connecting the Source to Sink directly */
+
 
   source
     .to(sink)
@@ -90,7 +91,21 @@ object Main extends App{
   val done: Future[Done] =
     factorials
       .zipWith(Source(0 to 100))((num, idx) => s"$idx! = $num")
-      .throttle(1, 1.second, 1, ThrottleMode.shaping)
+      .throttle(1, 1.second, 1, ThrottleMode.shaping) // throttle combinator, allowing 1 elements to be processed per second
       .runForeach(println)
+
+
+  done.onComplete(f=>
+  println(f))
+
+
+
+/* Throttle combinator, zipping two Sources */
+
+  source
+    .via(flow1)
+    .zipWith(Source(1000 to 10000))((num1, num2) => s"${num1} + ${num2} = ${(num1 + num2)}")
+    .throttle(4 , 1.second, 4, ThrottleMode.shaping) // throttle combinator, allowing 4 elements to be processed per second, and a maximum burst of 4 elements.
+    .runForeach(println)
 
 }
