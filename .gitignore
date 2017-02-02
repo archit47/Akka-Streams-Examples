@@ -1,10 +1,17 @@
 .DS_Store
 Example-1/target
+Example-2/target
 .log
 .class
 Example-1/target/
+Example-2/target/
 Example-1/project/target
+Example-2/project/target
 Example-1/project/.idea
+Example-2/project/.idea
 .cache
 Example-1/.idea/
+Example-2/.idea/
+Example-2/.idea
 Example-1/project/project/
+Example-2/project/project/
